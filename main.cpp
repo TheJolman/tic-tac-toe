@@ -1,79 +1,69 @@
 #include <iostream>
-#include <array>
-#include <limits>
+#include <vector>
 using namespace std;
 
-struct Player
-{
-  bool team; // false will be O, true wil be X
-  void makeMove(char& move)
-  {
-    if (!team)
-      move = 'o'; //ASCII value of 120
-    else 
-      move = 'x'; //ASCII value of 111
-  }
-};
+void drawBoard(vector<vector<char>> &);
 
-void drawBoard(array<array<char, 3>, 3>);
-bool gameOver(array<array<char, 3>, 3>);
+bool checkWin(vector<vector<char>> &, char player );
 
-int main()
-{
-  array<array<char, 3>, 3> board = {{{'#', '#', '#'}, {'#', '#', '#'}, {'#', '#', '#'}}};
-  drawBoard(board);
+int main() {
+  vector<vector<char>> board(3, vector<char>(3, ' '));
 
-  Player player1, player2;
-  cout << "Player 1: Choose x or o: ";
-  char team;
-  while (true)
-  {
-    cin >> team; //TODO: add input validation
-    if (team == 'o')
-    {
-      player1.team = true;
-      player2.team = false;
-      break;
+  char player = 'X';
+  int row = 0, col = 0;
+
+  while (true) {
+    drawBoard(board);
+    cout << player << " enter your move (row col): ";
+    cin >> row >> col;
+
+    // check for valid move
+    if (board[row][col] == ' ') {
+      board[row][col] = player;
+
+      // if move is valid, check for win
+      if (checkWin(board, player)) {
+        cout << player << " wins!!\n";
+        break;
+      }
+      player = (player == 'X') ? 'O' : 'X';
     }
-    else if (team == 'x')
-    {
-      player1.team = false;
-      player2.team = true;
-      break;
-    }
-    else 
-    {
-      cout << "Invalid Arguement. Player 1 try again: ";
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-
-    while (!(gameOver(array<array<char, 3>, 3>))) //main gameplay loop
-    {
-      
-
+    else {
+      cout << "Invalid move. Try again.\n";
     }
   }
 }
 
-void drawBoard(const array<array<char, 3>, 3> board)
-{
-  for (auto& row : board)
-  {
-    for (auto& element : row)
-    {
-      cout << element << " ";
-    }
+void drawBoard(vector<vector<char>>& board) {
+  int i = 0;
+  cout << "  0 1 2\n";
+  cout << "  - - -\n";
+  for (const auto& row : board) {
+    cout << i++;
+    cout << '|';
+    for (const auto& cell : row)
+      cout << cell << ' ';
+    cout << '|';
     cout << endl;
   }
+  cout << "  - - -\n";
 }
-//might be faster to have to player objects store their moves and pass those into this function
-bool gameOver(array<array<char, 3>, 3>) //126 and 111 (times 3 = 378 and 333)
-{
-  return false;
-  int sum;
-  while (sum != 378 || 333)
-  {
-    break;
+
+bool checkWin(vector<vector<char>>& board, char player ) {
+  // check rows
+  for (int i = 0; i < 3; i++) {
+    if (board[i][0] == player && board[i][1] == player && board[i][2] == player)
+      return true;
   }
-  
+  // check diagonals
+  if (board[1][1] == player) {
+    if ((board[0][0] == player && board[2][2] == player) || (board[0][2] == player && board[2][0] == player))
+      return true;
+  }
+  // check cols
+  for (int j = 0; j < 3; j++){
+    if (board[0][j] == player && board[1][j] == player && board[2][j] == player)
+      return true;
+  }
+  return false;
 }
